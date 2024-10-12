@@ -1,17 +1,24 @@
 <?php
 
+use App\RMVC\App as App;
+session_start();
 
-$username = 'palmo';
-$password = 'palmo';
-$dbname = 'palmo';
-$host = 'mysql';
+require '../vendor/autoload.php';
+require '../routes/web.php';
 
-$dsn = 'mysql:host=' . $host . ';dbname=' . $dbname . ';charset=utf8;';
+App::run();
 
-try {
-    $conn = new PDO($dsn, $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    var_dump($conn);
-} catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
-}
+//$username = 'palmo';
+//$password = 'palmo';
+//$dbname = 'palmo';
+//$host = 'mysql';
+//
+//$dsn = 'mysql:host=' . $host . ';dbname=' . $dbname . ';charset=utf8;';
+//
+//try {
+//    $conn = new PDO($dsn, $username, $password);
+//    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+//    var_dump($conn);
+//} catch (PDOException $e) {
+//    die("Connection failed: " . $e->getMessage());
+//}
