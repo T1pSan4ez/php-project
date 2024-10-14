@@ -12,7 +12,10 @@ class FilmController extends Controller
 {
     public function index()
     {
-        return View::view('film.index');
+        $title = 'Фільми';
+        $filmContent = __DIR__ . '/../../../resources/views/film/index.php';
+        include __DIR__ . '/../../../resources/views/layouts/layout.php';
+        //return View::view('film.index');
     }
 
     public function show($id)

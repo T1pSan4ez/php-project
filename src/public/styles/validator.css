@@ -1,0 +1,18 @@
+.form-group {
+    margin-bottom: 15px;
+}
+
+.error {
+    color: red;
+    font-size: 12px;
+    display: block;
+    margin-top: 5px;
+}
+
+.input-error {
+    border: 2px solid red;
+}
+
+button {
+    margin-top: 10px;
+}
