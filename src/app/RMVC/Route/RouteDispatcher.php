@@ -29,8 +29,9 @@ class RouteDispatcher
     private function saveRequestUri()
     {
         if ($_SERVER['REQUEST_URI'] !== '/') {
-            $this->requestUri = $_SERVER['REQUEST_URI'];
-            $this->requestUri = $this->clean($_SERVER['REQUEST_URI']);
+
+            $parsedUrl = parse_url($_SERVER['REQUEST_URI']);
+            $this->requestUri = $this->clean($parsedUrl['path']);
             $this->routeConfiguration->route = $this->clean($this->routeConfiguration->route);
         }
     }

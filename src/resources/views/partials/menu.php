@@ -1,28 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-    <link rel="stylesheet" href="/src/public/styles/movies.css">
-</head>
-<body>
-<nav>
-    <ul>
-        <li><a href="/films">Фильмы</a></li>
-        <li><a href="/films">Сериалы</a></li>
-        <?php if (isset($_SESSION['user'])): ?>
-            <li><a href="/profile">Мой профиль</a></li>
-            <li>
-                <form action="/logout" method="POST">
-                    <button type="submit">Выход</button>
+<nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/films">Фильмы</a>
+        <a class="navbar-brand" href="/series">Сериалы</a>
+
+        <div class="ms-auto d-flex align-items-center">
+            <?php if (isset($_SESSION['user'])): ?>
+                <a class="btn btn-outline-primary me-2" href="/profile">Мой профиль</a>
+                <form action="/logout" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger">Выход</button>
                 </form>
-            </li>
-        <?php else: ?>
-            <li><a href="/login">Войти</a></li>
-            <li><a href="/register">Регистрация</a></li>
-        <?php endif; ?>
-    </ul>
+            <?php else: ?>
+                <a class="btn btn-outline-primary me-2" href="/login">Войти</a>
+                <a class="btn btn-outline-secondary" href="/register">Регистрация</a>
+            <?php endif; ?>
+        </div>
+    </div>
 </nav>
-</body>
-</html>

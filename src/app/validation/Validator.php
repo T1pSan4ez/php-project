@@ -8,6 +8,7 @@ class Validator
         'username' => UsernameValidator::class,
         'email' => EmailValidator::class,
         'password' => PasswordValidator::class,
+        'profile_image' => ProfileImageValidator::class,
     ];
 
     public function validate(string $fieldType, $value): bool

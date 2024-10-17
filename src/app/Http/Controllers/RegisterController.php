@@ -11,7 +11,10 @@ class RegisterController extends Controller
 {
     public function index()
     {
-        return View::view('register.index');
+        $title = 'Регистрация';
+        $content = __DIR__ . '/../../../resources/views/register/index.php';
+        include __DIR__ . '/../../../resources/views/layouts/layout.php';
+       // return View::view('register.index');
     }
 
     public function show($post)
@@ -24,7 +27,6 @@ class RegisterController extends Controller
         $errors = [];
         $validator = new Validator();
         $db = new DB('mysql', 'palmo', 'palmo', 'palmo');
-
 
         if (!$validator->validate('username', $_POST['username'])) {
             $errors['username'] = 'Имя пользователя обязательно.';
@@ -58,7 +60,10 @@ class RegisterController extends Controller
             $hashedPassword,
         ]);
 
-        $_SESSION['message'] = 'Регистрация успешна!';
+        $_SESSION['success'] = 'Регистрация успешна! Пожалуйста, войдите в свой аккаунт.';
+
         Route::redirect('/register');
     }
+
+
 }

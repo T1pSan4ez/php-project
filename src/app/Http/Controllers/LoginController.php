@@ -11,7 +11,10 @@ class LoginController extends Controller
 {
     public function index()
     {
-        return View::view('login.index');
+        $title = 'Логин';
+        $content = __DIR__ . '/../../../resources/views/login/index.php';
+        include __DIR__ . '/../../../resources/views/layouts/layout.php';
+        //return View::view('login.index');
     }
 
     public function login()
