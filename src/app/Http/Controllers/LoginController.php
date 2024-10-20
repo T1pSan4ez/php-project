@@ -48,7 +48,8 @@ class LoginController extends Controller
                 'id' => $user['id'],
                 'email' => $user['email'],
                 'name' => $user['username'],
-                'profile_image' => $user['profile_image'] ?? 'default-profile.jpg'
+                'profile_image' => $user['profile_image'] ?? 'default-profile.jpg',
+                'admin_role' => $user['admin_role']
             ];
 
             if ($remember_me) {

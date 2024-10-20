@@ -46,7 +46,6 @@
 
                 <div class="card-footer">
                     <strong>Комментарии:</strong>
-
                     <form action="/add-comment" method="POST" >
                         <div class="form-group">
                             <label for="comment_text">Добавить комментарий:</label>
@@ -59,8 +58,8 @@
                     <?php if (!empty($comments)): ?>
                         <div class="comments-list mt-3">
                             <?php foreach ($comments as $comment): ?>
-                                <div class="d-flex gap-3 mb-3 p-3 border rounded shadow-sm align-items-start">
-                                    <div class="mr-3">
+                                <div class="row mb-3 p-3 border rounded shadow-sm">
+                                    <div class="col-auto">
                                         <?php
                                         $profileImage = isset($comment['user_avatar']) && !empty($comment['user_avatar'])
                                             ? '/uploads/' . htmlspecialchars($comment['user_avatar'])
@@ -68,14 +67,50 @@
                                         ?>
                                         <img src="<?= $profileImage ?>" class="rounded-circle" alt="User avatar" width="64" height="64">
                                     </div>
-                                    <div>
+
+                                    <div class="col">
                                         <h5 class="mt-0 mb-0"><?= htmlspecialchars($comment['username']) ?></h5>
                                         <p class="mb-0"><?= htmlspecialchars($comment['comment_text']) ?></p>
                                         <small class="text-muted"><?= htmlspecialchars($comment['created_at']) ?></small>
                                     </div>
+
+                                    <div class="col-auto">
+                                        <?php if (
+                                            isset($_SESSION['user']) &&
+                                            ($_SESSION['user']['id'] === $comment['user_id'] || ($_SESSION['user']['admin_role'] ?? 0) == 1)
+                                        ): ?>
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(<?= htmlspecialchars($comment['id']) ?>)">
+                                                Удалить
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
+
+                        <?php if ($totalPages > 1): ?>
+                            <nav aria-label="Навигация по комментариям">
+                                <ul class="pagination justify-content-center mt-4">
+                                    <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $currentPage - 1 ?>" aria-label="Предыдущая">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+
+                                    <?php for ($page = 1; $page <= $totalPages; $page++): ?>
+                                        <li class="page-item <?= ($page == $currentPage) ? 'active' : '' ?>">
+                                            <a class="page-link" href="?page=<?= $page ?>"><?= $page ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+
+                                    <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+                                        <a class="page-link" href="?page=<?= $currentPage + 1 ?>" aria-label="Следующая">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <?php endif; ?>
 
                     <?php else: ?>
                         <p class="text-muted">Комментариев пока нет.</p>
@@ -106,6 +141,38 @@
                         modal.show();
                         <?php endif; ?>
                     });
+                </script>
+
+                <div class="modal fade" id="deleteCommentModal" tabindex="-1" aria-labelledby="deleteCommentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteCommentModalLabel">Подтверждение удаления</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                            </div>
+                            <div class="modal-body">
+                                Вы уверены, что хотите удалить этот комментарий?
+                            </div>
+                            <div class="modal-footer">
+                                <form id="deleteCommentForm" action="/delete-comment" method="POST">
+                                    <input type="hidden" name="comment_id" id="commentId">
+                                    <input type="hidden" name="movie_id" value="<?= htmlspecialchars($movieId) ?>">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                    <button type="submit" class="btn btn-danger">Удалить</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function confirmDelete(commentId) {
+                        var deleteModal = new bootstrap.Modal(document.getElementById('deleteCommentModal'), {
+                            keyboard: false
+                        });
+                        document.getElementById('commentId').value = commentId;
+                        deleteModal.show();
+                    }
                 </script>
             </div>
         </div>

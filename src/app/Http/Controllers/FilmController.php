@@ -108,30 +108,37 @@ class FilmController extends Controller
 
     public function show($id)
     {
+        $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $commentsPerPage = 5;
+        $offset = ($currentPage - 1) * $commentsPerPage;
+
         $film = $this->getFilmById($id);
         $genres = $this->getGenresByFilmId($id);
-        $comments = $this->getCommentsByFilmId($id);
+        $totalComments = $this->getTotalCommentsByFilmId($id);
+        $comments = $this->getCommentsByFilmId($id, $commentsPerPage, $offset);
+
+        $totalPages = ceil($totalComments / $commentsPerPage);
 
         if (!$film) {
             Route::redirect('/films');
             return;
         }
 
+        $movieId = $id;
         $content = __DIR__ . '/../../../resources/views/film/show.php';
-        $layout = __DIR__ . '/../../../resources/views/layouts/layout.php';
-
-        include $layout;
+        include __DIR__ . '/../../../resources/views/layouts/layout.php';
     }
 
-    public  function getCommentsByFilmId($id)
+    public function getCommentsByFilmId($id, $limit = 5, $offset = 0)
     {
         $db = new DB();
         $sql = "
-        SELECT comments.comment_text, comments.created_at, comments.user_avatar, users.username
-        FROM comments
-        JOIN users ON comments.user_id = users.id
-        WHERE comments.movie_id = ?
-        ORDER BY comments.created_at DESC
+    SELECT comments.id, comments.user_id, comments.comment_text, comments.created_at, comments.user_avatar, users.username
+    FROM comments
+    JOIN users ON comments.user_id = users.id
+    WHERE comments.movie_id = ?
+    ORDER BY comments.created_at DESC
+    LIMIT $limit OFFSET $offset
     ";
         return $db->fetchAll($sql, [$id]);
     }
@@ -152,7 +159,15 @@ class FilmController extends Controller
         INNER JOIN movie_genre ON genres.id = movie_genre.genre_id 
         WHERE movie_genre.movie_id = ?
     ";
-
         return $db->fetchAll($sql, [$id]);
     }
+
+    public function getTotalCommentsByFilmId($id)
+    {
+        $db = new DB();
+        $sql = "SELECT COUNT(*) as total_comments FROM comments WHERE movie_id = ?";
+        $result = $db->fetch($sql, [$id]);
+        return $result['total_comments'] ?? 0;
+    }
+
 }

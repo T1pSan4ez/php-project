@@ -23,5 +23,5 @@ Route::get('/films/{id}', [FilmController::class, 'show'])->name('films.show');
 Route::post('/films', [FilmController::class, 'store'])->name('films.store');
 
 Route::post('/add-comment', [CommentController::class, 'addComment']);
-
+Route::post('/delete-comment', [CommentController::class, 'deleteComment']);
 
