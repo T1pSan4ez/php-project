@@ -117,14 +117,19 @@ class FilmController extends Controller
         $totalComments = $this->getTotalCommentsByFilmId($id);
         $comments = $this->getCommentsByFilmId($id, $commentsPerPage, $offset);
 
-        $totalPages = ceil($totalComments / $commentsPerPage);
-
-        if (!$film) {
-            Route::redirect('/films');
-            return;
-        }
+        $ratingController = new RatingController();
+        $averageRating = $ratingController->getAverageRating($id);
 
         $movieId = $id;
+
+        $userRating = null;
+        if (isset($_SESSION['user'])) {
+            $userId = $_SESSION['user']['id'];
+            $userRating = $ratingController->getUserRating($id, $userId);
+        }
+
+        $totalPages = ceil($totalComments / $commentsPerPage);
+
         $content = __DIR__ . '/../../../resources/views/film/show.php';
         include __DIR__ . '/../../../resources/views/layouts/layout.php';
     }

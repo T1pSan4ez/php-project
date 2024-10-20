@@ -8,7 +8,8 @@
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <img src="/uploads/films-one.jpg" class="img-fluid" alt="<?= htmlspecialchars($film['title']) ?>">
+                            <img src="/uploads/films-one.jpg" class="img-fluid"
+                                 alt="<?= htmlspecialchars($film['title']) ?>">
 
                             <div class="mb-3">
                                 <strong>Дата выхода:</strong>
@@ -29,7 +30,7 @@
                             <div class="mb-2">
                                 <strong>Жанр:</strong>
                                 <?php foreach ($genres as $genre): ?>
-                                     <?= htmlspecialchars($genre['name']) ?>;
+                                    <?= htmlspecialchars($genre['name']) ?>;
                                 <?php endforeach; ?>
                             </div>
                             <div class="mb-2">
@@ -43,13 +44,56 @@
                         <p class="card-text"><?= htmlspecialchars($film['overview']) ?></p>
                     </div>
                 </div>
+                <div class="container mt-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mt-4">
+                                <strong>Средняя оценка:
+                                    <?php if (isset($averageRating)): ?>
+                                        <span class="badge bg-success"><?= round($averageRating, 2); ?> </span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">Нет оценок</span>
+                                    <?php endif; ?>
+                                </strong>
+                            </div>
 
+                            <?php if (isset($_SESSION['user'])): ?>
+                                <?php if ($userRating): ?>
+                                    <div class="mt-4 mb-4">
+                                        <strong>Ваша оценка: <span class="badge bg-primary"><?= $userRating; ?> / 10</span></strong>
+                                    </div>
+                                <?php else: ?>
+                                    <form action="/rate-movie" method="POST" id="ratingForm" class="mt-4 mb-4">
+                                        <input type="hidden" name="movie_id" value="<?= htmlspecialchars($movieId); ?>">
+
+                                        <div class="mb-3">
+                                            <label for="rating" class="form-label">Поставьте оценку:</label>
+                                            <select name="rating" id="rating" class="form-select" required>
+                                                <option value="" disabled selected>Выберите оценку</option>
+                                                <?php for ($i = 1; $i <= 10; $i++): ?>
+                                                    <option value="<?= $i; ?>"><?= $i; ?></option>
+                                                <?php endfor; ?>
+                                            </select>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary">Отправить оценку</button>
+                                    </form>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <div class="mt-4">
+                                    <p class="text-danger">Только авторизованные пользователи могут оставлять оценки. <a href="/login">Войдите в систему</a>.</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
                 <div class="card-footer">
                     <strong>Комментарии:</strong>
-                    <form action="/add-comment" method="POST" >
+                    <form action="/add-comment" method="POST">
                         <div class="form-group">
                             <label for="comment_text">Добавить комментарий:</label>
-                            <textarea name="comment_text" class="form-control" id="comment_text" rows="3" required></textarea>
+                            <textarea name="comment_text" class="form-control" id="comment_text" rows="3"
+                                      required></textarea>
                         </div>
                         <input type="hidden" name="movie_id" value="<?= htmlspecialchars($film['id']) ?>">
                         <button type="submit" class="btn btn-primary mt-3">Отправить</button>
@@ -65,7 +109,8 @@
                                             ? '/uploads/' . htmlspecialchars($comment['user_avatar'])
                                             : 'https://via.placeholder.com/64';
                                         ?>
-                                        <img src="<?= $profileImage ?>" class="rounded-circle" alt="User avatar" width="64" height="64">
+                                        <img src="<?= $profileImage ?>" class="rounded-circle" alt="User avatar"
+                                             width="64" height="64">
                                     </div>
 
                                     <div class="col">
@@ -79,7 +124,8 @@
                                             isset($_SESSION['user']) &&
                                             ($_SESSION['user']['id'] === $comment['user_id'] || ($_SESSION['user']['admin_role'] ?? 0) == 1)
                                         ): ?>
-                                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(<?= htmlspecialchars($comment['id']) ?>)">
+                                            <button type="button" class="btn btn-danger btn-sm"
+                                                    onclick="confirmDelete(<?= htmlspecialchars($comment['id']) ?>)">
                                                 Удалить
                                             </button>
                                         <?php endif; ?>
@@ -92,7 +138,8 @@
                             <nav aria-label="Навигация по комментариям">
                                 <ul class="pagination justify-content-center mt-4">
                                     <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
-                                        <a class="page-link" href="?page=<?= $currentPage - 1 ?>" aria-label="Предыдущая">
+                                        <a class="page-link" href="?page=<?= $currentPage - 1 ?>"
+                                           aria-label="Предыдущая">
                                             <span aria-hidden="true">&laquo;</span>
                                         </a>
                                     </li>
@@ -104,7 +151,8 @@
                                     <?php endfor; ?>
 
                                     <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
-                                        <a class="page-link" href="?page=<?= $currentPage + 1 ?>" aria-label="Следующая">
+                                        <a class="page-link" href="?page=<?= $currentPage + 1 ?>"
+                                           aria-label="Следующая">
                                             <span aria-hidden="true">&raquo;</span>
                                         </a>
                                     </li>
@@ -117,12 +165,14 @@
                     <?php endif; ?>
                 </div>
 
-                <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+                <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel"
+                     aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="errorModalLabel">Ошибка</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <?= htmlspecialchars($error ?? ''); ?>
@@ -135,7 +185,7 @@
                 </div>
 
                 <script>
-                    document.addEventListener('DOMContentLoaded', function() {
+                    document.addEventListener('DOMContentLoaded', function () {
                         <?php if (!empty($error)): ?>
                         var modal = new bootstrap.Modal(document.getElementById('errorModal'));
                         modal.show();
@@ -143,12 +193,14 @@
                     });
                 </script>
 
-                <div class="modal fade" id="deleteCommentModal" tabindex="-1" aria-labelledby="deleteCommentModalLabel" aria-hidden="true">
+                <div class="modal fade" id="deleteCommentModal" tabindex="-1" aria-labelledby="deleteCommentModalLabel"
+                     aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="deleteCommentModalLabel">Подтверждение удаления</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Закрыть"></button>
                             </div>
                             <div class="modal-body">
                                 Вы уверены, что хотите удалить этот комментарий?
@@ -157,7 +209,8 @@
                                 <form id="deleteCommentForm" action="/delete-comment" method="POST">
                                     <input type="hidden" name="comment_id" id="commentId">
                                     <input type="hidden" name="movie_id" value="<?= htmlspecialchars($movieId) ?>">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена
+                                    </button>
                                     <button type="submit" class="btn btn-danger">Удалить</button>
                                 </form>
                             </div>

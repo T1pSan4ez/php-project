@@ -3,6 +3,7 @@
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FilmController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\RMVC\Route\Route;
@@ -24,4 +25,4 @@ Route::post('/films', [FilmController::class, 'store'])->name('films.store');
 
 Route::post('/add-comment', [CommentController::class, 'addComment']);
 Route::post('/delete-comment', [CommentController::class, 'deleteComment']);
-
+Route::post('/rate-movie', [RatingController::class, 'rateMovie']);
