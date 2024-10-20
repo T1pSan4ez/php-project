@@ -9,8 +9,8 @@
 
         <div class="col">
             <form class="d-flex" role="search" action="/films" method="GET">
-                <input class="form-control me-2" type="search" name="query" placeholder="Search for films..." aria-label="Search" value="<?= isset($_GET['query']) ? htmlspecialchars($_GET['query']) : '' ?>">
-                <button class="btn btn-outline-success" type="submit">Search</button>
+                <input class="form-control me-2" type="search" name="query" placeholder="Поиск фильмов..." aria-label="Search" value="<?= isset($_GET['query']) ? htmlspecialchars($_GET['query']) : '' ?>">
+                <button class="btn btn-outline-success" type="submit">Поиск</button>
             </form>
         </div>
     </div>
@@ -55,7 +55,9 @@
             <?php foreach ($films as $index => $film): ?>
             <div class="col-md-3 mb-4">
                 <div class="card h-100" style="width: 100%;">
-                    <img src="/uploads/image.png" class="card-img-top" alt="...">
+                    <a href="/films/<?= htmlspecialchars($film['id']) ?>">
+                        <img src="/uploads/films-one.jpg" class="card-img-top" alt="<?= htmlspecialchars($film['title']) ?>">
+                    </a>
                     <div class="card-body">
                         <h5 class="card-title"><?= htmlspecialchars($film['original_title']); ?></h5>
                         <p class="card-text"><?= htmlspecialchars($film['release_date']); ?></p>

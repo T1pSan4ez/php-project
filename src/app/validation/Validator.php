@@ -8,6 +8,10 @@ class Validator
         'username' => UsernameValidator::class,
         'email' => EmailValidator::class,
         'password' => PasswordValidator::class,
+        'preferred_rating' => PreferredRatingValidator::class,
+        'birthdate' => BirthdateValidator::class,
+        'gender' => GenderValidator::class,
+        'notifications' => NotificationsValidator::class,
         'profile_image' => ProfileImageValidator::class,
     ];
 

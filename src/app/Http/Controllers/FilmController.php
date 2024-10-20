@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\RMVC\Database\DB;
-
+use App\RMVC\Route\Route;
+use App\RMVC\View\View;
 class FilmController extends Controller
 {
     public function index($page = 1)
@@ -103,5 +104,55 @@ class FilmController extends Controller
     private function getGenres(DB $db)
     {
         return $db->fetchAll("SELECT id, name FROM genres");
+    }
+
+    public function show($id)
+    {
+        $film = $this->getFilmById($id);
+        $genres = $this->getGenresByFilmId($id);
+        $comments = $this->getCommentsByFilmId($id);
+
+        if (!$film) {
+            Route::redirect('/films');
+            return;
+        }
+
+        $content = __DIR__ . '/../../../resources/views/film/show.php';
+        $layout = __DIR__ . '/../../../resources/views/layouts/layout.php';
+
+        include $layout;
+    }
+
+    public  function getCommentsByFilmId($id)
+    {
+        $db = new DB();
+        $sql = "
+        SELECT comments.comment_text, comments.created_at, comments.user_avatar, users.username
+        FROM comments
+        JOIN users ON comments.user_id = users.id
+        WHERE comments.movie_id = ?
+        ORDER BY comments.created_at DESC
+    ";
+        return $db->fetchAll($sql, [$id]);
+    }
+
+    public  function getFilmById($id)
+    {
+        $db = new DB();
+        return $db->fetch("SELECT * FROM movies WHERE id = ?", [$id]);
+    }
+
+    public  function getGenresByFilmId($id)
+    {
+        $db = new DB();
+
+        $sql = "
+        SELECT genres.name 
+        FROM genres 
+        INNER JOIN movie_genre ON genres.id = movie_genre.genre_id 
+        WHERE movie_genre.movie_id = ?
+    ";
+
+        return $db->fetchAll($sql, [$id]);
     }
 }

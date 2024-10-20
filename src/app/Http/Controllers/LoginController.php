@@ -48,6 +48,7 @@ class LoginController extends Controller
                 'id' => $user['id'],
                 'email' => $user['email'],
                 'name' => $user['username'],
+                'profile_image' => $user['profile_image'] ?? 'default-profile.jpg'
             ];
 
             if ($remember_me) {
@@ -63,17 +64,14 @@ class LoginController extends Controller
         }
     }
 
-
     public function logout()
     {
-
         if (isset($_SESSION['user'])) {
             $userId = $_SESSION['user']['id'];
             $db = new DB('mysql', 'palmo', 'palmo', 'palmo');
             $db->execute("UPDATE users SET remember_token = NULL WHERE id = ?", [$userId]);
 
             setcookie('remember_me', '', time() - 3600, "/", "", false, true);
-
             session_destroy();
         }
 

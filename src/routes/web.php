@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ExploreController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FilmController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
@@ -15,10 +15,13 @@ Route::get('/login', [LoginController::class, 'index'])->name('login.index');
 Route::post('/login', [LoginController::class, 'login'])->name('login.login');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit')->middleware('auth');
 Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
 
-Route::get('/films/{page}', [FilmController::class, 'index']);
+Route::get('/films', [FilmController::class, 'index']);
+Route::get('/films/{id}', [FilmController::class, 'show'])->name('films.show');
 Route::post('/films', [FilmController::class, 'store'])->name('films.store');
 
-Route::get('/films/{id}', [FilmController::class, 'show'])->name('films.show');
+Route::post('/add-comment', [CommentController::class, 'addComment']);
+
+

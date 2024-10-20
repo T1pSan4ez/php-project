@@ -4,7 +4,6 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h2 class="text-center mb-4">Логин</h2>
-
                     <form action="/login" method="post">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email:</label>
