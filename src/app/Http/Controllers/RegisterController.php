@@ -49,6 +49,11 @@ class RegisterController extends Controller
             } else {
                 $errors['email'] = 'Неверный формат электронной почты.';
             }
+        } else {
+            $existingUser = $db->fetch("SELECT * FROM users WHERE email = ?", [$_POST['email']]);
+            if ($existingUser) {
+                $errors['email'] = 'Этот email уже зарегистрирован. Попробуйте другой.';
+            }
         }
 
         if (empty($_POST['birthdate']) || !$validator->validate('birthdate', $_POST['birthdate'])) {
@@ -79,7 +84,7 @@ class RegisterController extends Controller
 
         $hashedPassword = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-        $profileImagePath = null;
+        $profileImagePath = 'default-profile.jpg';
         if (isset($_FILES['profile_image']) && !empty($_FILES['profile_image']['name'])) {
             $targetDir = '/var/www/src/public/uploads/';
             $targetFile = $targetDir . basename($_FILES['profile_image']['name']);

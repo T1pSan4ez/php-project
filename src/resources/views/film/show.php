@@ -103,23 +103,22 @@
                         <div class="comments-list mt-3">
                             <?php foreach ($comments as $comment): ?>
                                 <div class="row mb-3 p-3 border rounded shadow-sm">
-                                    <div class="col-auto">
+                                    <div class="col-2 text-center">
                                         <?php
                                         $profileImage = isset($comment['user_avatar']) && !empty($comment['user_avatar'])
                                             ? '/uploads/' . htmlspecialchars($comment['user_avatar'])
                                             : 'https://via.placeholder.com/64';
                                         ?>
-                                        <img src="<?= $profileImage ?>" class="rounded-circle" alt="User avatar"
-                                             width="64" height="64">
+                                        <img src="<?= $profileImage ?>" class="rounded-circle" alt="User avatar" width="64" height="64">
                                     </div>
 
-                                    <div class="col">
-                                        <h5 class="mt-0 mb-0"><?= htmlspecialchars($comment['username']) ?></h5>
-                                        <p class="mb-0"><?= htmlspecialchars($comment['comment_text']) ?></p>
+                                    <div class="col-8">
+                                        <h5 class="mt-0 mb-1"><?= htmlspecialchars($comment['username']) ?></h5>
+                                        <p class="mb-1"><?= nl2br(htmlspecialchars($comment['comment_text'])) ?></p>
                                         <small class="text-muted"><?= htmlspecialchars($comment['created_at']) ?></small>
                                     </div>
 
-                                    <div class="col-auto">
+                                    <div class="col-2 text-end">
                                         <?php if (
                                             isset($_SESSION['user']) &&
                                             ($_SESSION['user']['id'] === $comment['user_id'] || ($_SESSION['user']['admin_role'] ?? 0) == 1)

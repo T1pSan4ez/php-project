@@ -21,6 +21,7 @@ class ProfileController extends Controller
             'name' => $user['username'],
             'email' => $user['email'],
             'profile_image' => $user['profile_image'],
+            'admin_role' => $user['admin_role']
         ];
 
         $title = 'Профиль';

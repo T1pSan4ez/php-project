@@ -4,30 +4,34 @@ namespace App\RMVC\Route;
 
 class RouteConfiguration
 {
-   public string $route;
-   public string $controller;
-   public string $action;
+    public string $route;
+    public string $controller;
+    public string $action;
 
-   private string $name;
-   private string $middleware;
+    private string $name;
+    private string $middleware;
 
-  public function __construct(string $route, string $controller, string $action)
-  {
-      $this->route = $route;
-      $this->controller = $controller;
-      $this->action = $action;
-  }
+    public function __construct(string $route, string $controller, string $action)
+    {
+        $this->route = $route;
+        $this->controller = $controller;
+        $this->action = $action;
+    }
 
-  public function name(string $name): RouteConfiguration
-  {
-      $this->name = $name;
-      return $this;
-  }
+    public function name(string $name): RouteConfiguration
+    {
+        $this->name = $name;
+        return $this;
+    }
 
-  public function middleware(string $middleware): RouteConfiguration
-  {
-      $this->middleware = $middleware;
-      return $this;
-  }
+    public function middleware(string $middleware): RouteConfiguration
+    {
+        $this->middleware = $middleware;
+        return $this;
+    }
 
+    public function getMiddleware(): ?string
+    {
+        return $this->middleware ?? null;
+    }
 }

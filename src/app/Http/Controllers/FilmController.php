@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\RMVC\Database\DB;
 use App\RMVC\Route\Route;
 use App\RMVC\View\View;
+
 class FilmController extends Controller
 {
     public function index($page = 1)
@@ -113,6 +114,13 @@ class FilmController extends Controller
         $offset = ($currentPage - 1) * $commentsPerPage;
 
         $film = $this->getFilmById($id);
+
+        if (!$film) {
+
+            Route::redirect('/error');
+            exit();
+        }
+
         $genres = $this->getGenresByFilmId($id);
         $totalComments = $this->getTotalCommentsByFilmId($id);
         $comments = $this->getCommentsByFilmId($id, $commentsPerPage, $offset);
@@ -148,13 +156,13 @@ class FilmController extends Controller
         return $db->fetchAll($sql, [$id]);
     }
 
-    public  function getFilmById($id)
+    public function getFilmById($id)
     {
         $db = new DB();
         return $db->fetch("SELECT * FROM movies WHERE id = ?", [$id]);
     }
 
-    public  function getGenresByFilmId($id)
+    public function getGenresByFilmId($id)
     {
         $db = new DB();
 
