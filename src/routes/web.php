@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\Error404Controller;
 use App\Http\Controllers\FilmController;
@@ -29,3 +30,34 @@ Route::post('/delete-comment', [CommentController::class, 'deleteComment']);
 Route::post('/rate-movie', [RatingController::class, 'rateMovie']);
 
 Route::get('/error', [Error404Controller::class, 'notFound'])->name('error.notFound');
+
+Route::get('/admin-panel', [AdminController::class, 'panel'])
+    ->name('admin.profile')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::get('/admin-panel/dashboard', [AdminController::class, 'dashboard'])
+    ->name('admin.dashboard')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::get('/admin-panel/movies', [AdminController::class, 'editMovies'])
+    ->name('admin.movies')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::get('/admin-panel/edit-movie/{id}', [AdminController::class, 'showEditMovieForm'])
+    ->name('admin.movies.edit')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::post('/admin-panel/movies/update', [AdminController::class, 'updateMovie'])
+    ->name('admin.movies.update')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::get('/admin-panel/users', [AdminController::class, 'manageUsers'])
+    ->name('admin.users')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+

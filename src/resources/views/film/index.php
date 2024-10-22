@@ -55,8 +55,15 @@
             <?php foreach ($films as $index => $film): ?>
             <div class="col-md-3 mb-4">
                 <div class="card h-100" style="width: 100%;">
-                    <a href="/films/<?= htmlspecialchars($film['id']) ?>">
-                        <img src="/uploads/films-one.jpg" class="card-img-top" alt="<?= htmlspecialchars($film['title']) ?>">
+                    <a href="/films/<?= htmlspecialchars($film['id'] ?? '') ?>">
+                        <?php
+                        $posterPath = !empty($film['poster_path']) ? '/uploads/' . htmlspecialchars($film['poster_path']) : '';
+
+                        if (!empty($posterPath) && file_exists($_SERVER['DOCUMENT_ROOT'] . $posterPath)): ?>
+                            <img src="<?= $posterPath ?>" class="card-img-top" alt="<?= htmlspecialchars($film['title'] ?? 'No title') ?>">
+                        <?php else: ?>
+                            <img src="/uploads/films-one.jpg" class="card-img-top" alt="<?= htmlspecialchars($film['title'] ?? 'No title') ?>">
+                        <?php endif; ?>
                     </a>
                     <div class="card-body">
                         <h5 class="card-title"><?= htmlspecialchars($film['original_title']); ?></h5>

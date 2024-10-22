@@ -3,12 +3,17 @@
         <div class="col-md-12">
             <div class="card shadow-lg">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="card-title"><?= htmlspecialchars($film['title']) ?></h3>
+                    <h3 class="card-title"><?= htmlspecialchars($film['original_title']) ?></h3>
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <img src="/uploads/films-one.jpg" class="img-fluid"
+                            <?php
+                            $posterPath = !empty($film['poster_path']) ? '/uploads/' . htmlspecialchars($film['poster_path']) : '';
+                            ?>
+
+                            <img src="<?= (!empty($posterPath) && file_exists($_SERVER['DOCUMENT_ROOT'] . $posterPath)) ? $posterPath : '/uploads/films-one.jpg' ?>"
+                                 class="img-fluid"
                                  alt="<?= htmlspecialchars($film['title']) ?>">
 
                             <div class="mb-3">
@@ -42,6 +47,17 @@
                     <div class="mb-3">
                         <strong>Описание:</strong>
                         <p class="card-text"><?= htmlspecialchars($film['overview']) ?></p>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Видео:</strong>
+                        <?php if (!empty($film['video'])): ?>
+                            <div class="ratio ratio-16x9">
+                                <iframe class="w-100" src="https://www.youtube.com/embed/<?= htmlspecialchars($film['video']) ?>" allowfullscreen></iframe>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted">Видео недоступно.</p>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="container mt-4">
@@ -89,15 +105,21 @@
                 </div>
                 <div class="card-footer">
                     <strong>Комментарии:</strong>
-                    <form action="/add-comment" method="POST">
-                        <div class="form-group">
-                            <label for="comment_text">Добавить комментарий:</label>
-                            <textarea name="comment_text" class="form-control" id="comment_text" rows="3"
-                                      required></textarea>
+
+                    <?php if (isset($_SESSION['user'])): ?>
+                        <form action="/add-comment" method="POST">
+                            <div class="form-group">
+                                <label for="comment_text">Добавить комментарий:</label>
+                                <textarea name="comment_text" class="form-control" id="comment_text" rows="3" required></textarea>
+                            </div>
+                            <input type="hidden" name="movie_id" value="<?= htmlspecialchars($film['id']) ?>">
+                            <button type="submit" class="btn btn-primary mt-3">Отправить</button>
+                        </form>
+                    <?php else: ?>
+                        <div class="mt-3">
+                            <p class="text-danger">Только авторизованные пользователи могут оставлять комментарии. <a href="/login">Войдите в систему</a>.</p>
                         </div>
-                        <input type="hidden" name="movie_id" value="<?= htmlspecialchars($film['id']) ?>">
-                        <button type="submit" class="btn btn-primary mt-3">Отправить</button>
-                    </form>
+                    <?php endif; ?>
 
                     <?php if (!empty($comments)): ?>
                         <div class="comments-list mt-3">

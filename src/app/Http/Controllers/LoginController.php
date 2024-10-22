@@ -76,6 +76,8 @@ class LoginController extends Controller
             session_destroy();
         }
 
-        Route::redirect('/login');
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
+        exit();
+        //Route::redirect('/login');
     }
 }

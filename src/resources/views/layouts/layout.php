@@ -8,12 +8,11 @@
 
 
     <title><?= $title ?? 'Мій сайт' ?></title>
+
 </head>
 <body>
 
 <?php include __DIR__ . '/../partials/menu.php'; ?>
-
-
 
 <div>
     <?php include $content; ?>

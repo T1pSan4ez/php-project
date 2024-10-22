@@ -9,6 +9,11 @@
                 ?>
                 <img src="/uploads/<?= $profileImage ?>" alt="Profile Image" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
                 <a class="btn btn-outline-primary me-2" href="/profile">Мой профиль</a>
+
+                <?php if (!empty($_SESSION['user']['admin_role']) && $_SESSION['user']['admin_role'] == 1): ?>
+                    <a class="btn btn-outline-warning me-2" href="/admin-panel/dashboard">Администрация</a>
+                <?php endif; ?>
+
                 <form action="/logout" method="POST" class="d-inline">
                     <button type="submit" class="btn btn-outline-danger">Выход</button>
                 </form>
@@ -17,5 +22,6 @@
                 <a class="btn btn-outline-secondary" href="/register">Регистрация</a>
             <?php endif; ?>
         </div>
+
     </div>
 </nav>
