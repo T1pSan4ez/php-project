@@ -146,7 +146,8 @@ class FilmController extends Controller
     {
         $db = new DB();
         $sql = "
-    SELECT comments.id, comments.user_id, comments.comment_text, comments.created_at, comments.user_avatar, users.username
+    SELECT comments.*, users.username, 
+           IFNULL((SELECT COUNT(*) FROM comment_likes WHERE comment_likes.comment_id = comments.id), 0) as like_count
     FROM comments
     JOIN users ON comments.user_id = users.id
     WHERE comments.movie_id = ?

@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <form action="/admin-panel/movies" method="GET" class="d-flex">
-        <input type="text" name="search" class="form-control me-2" placeholder="Введите название фильма" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
+        <input style="width: 250px;" type="text" name="search" class="form-control me-2" placeholder="Введите название фильма" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
         <button type="submit" class="btn btn-primary">Поиск</button>
     </form>
 </div>

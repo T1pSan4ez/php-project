@@ -34,9 +34,13 @@
                             </div>
                             <div class="mb-2">
                                 <strong>Жанр:</strong>
-                                <?php foreach ($genres as $genre): ?>
-                                    <?= htmlspecialchars($genre['name']) ?>;
-                                <?php endforeach; ?>
+                                <?php if (!empty($genres)): ?>
+                                    <?php foreach ($genres as $genre): ?>
+                                        <?= htmlspecialchars($genre['name']) ?>;
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <span>Нет данных</span>
+                                <?php endif; ?>
                             </div>
                             <div class="mb-2">
 
@@ -133,7 +137,6 @@
                                         ?>
                                         <img src="<?= $profileImage ?>" class="rounded-circle" alt="User avatar" width="64" height="64">
                                     </div>
-
                                     <div class="col-8">
                                         <h5 class="mt-0 mb-1"><?= htmlspecialchars($comment['username']) ?></h5>
                                         <p class="mb-1"><?= nl2br(htmlspecialchars($comment['comment_text'])) ?></p>
@@ -141,18 +144,23 @@
                                     </div>
 
                                     <div class="col-2 text-end">
-                                        <?php if (
-                                            isset($_SESSION['user']) &&
-                                            ($_SESSION['user']['id'] === $comment['user_id'] || ($_SESSION['user']['admin_role'] ?? 0) == 1)
-                                        ): ?>
-                                            <button type="button" class="btn btn-danger btn-sm"
-                                                    onclick="confirmDelete(<?= htmlspecialchars($comment['id']) ?>)">
+                                        <?php if (isset($_SESSION['user']) && ($_SESSION['user']['id'] === $comment['user_id'] || ($_SESSION['user']['admin_role'] ?? 0) == 1)): ?>
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(<?= htmlspecialchars($comment['id']) ?>)">
                                                 Удалить
                                             </button>
                                         <?php endif; ?>
+
+                                        <form action="/comments/like" method="POST" class="d-inline">
+                                            <input type="hidden" name="comment_id" value="<?= htmlspecialchars($comment['id']) ?>">
+                                            <input type="hidden" name="movie_id" value="<?= htmlspecialchars($comment['movie_id']) ?>">
+                                            <button type="submit" class="btn btn-light btn-sm">
+                                                👍 <?= htmlspecialchars($comment['like_count'] ?? '0') ?>
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
+
                         </div>
 
                         <?php if ($totalPages > 1): ?>

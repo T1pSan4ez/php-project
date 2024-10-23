@@ -29,6 +29,10 @@ Route::post('/add-comment', [CommentController::class, 'addComment']);
 Route::post('/delete-comment', [CommentController::class, 'deleteComment']);
 Route::post('/rate-movie', [RatingController::class, 'rateMovie']);
 
+Route::post('/comments/like', [CommentController::class, 'toggleLikeComment'])
+    ->name('comments.like')
+    ->middleware('AuthMiddleware');
+
 Route::get('/error', [Error404Controller::class, 'notFound'])->name('error.notFound');
 
 Route::get('/admin-panel', [AdminController::class, 'panel'])
@@ -48,6 +52,46 @@ Route::get('/admin-panel/movies', [AdminController::class, 'editMovies'])
 
 Route::get('/admin-panel/edit-movie/{id}', [AdminController::class, 'showEditMovieForm'])
     ->name('admin.movies.edit')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::get('/admin-panel/movies/add', [AdminController::class, 'showAddMovieForm'])
+    ->name('admin.movies.add.form')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::post('/admin-panel/movies/add', [AdminController::class, 'addMovie'])
+    ->name('admin.movies.add')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::get('/admin-panel/movies/delete', [AdminController::class, 'showDeleteMovieForm'])
+    ->name('admin.movies.delete.form')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::post('/admin-panel/movies/delete/{id}', [AdminController::class, 'deleteMovie'])
+    ->name('admin.movies.delete')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::get('/admin-panel/movies/genres', [AdminController::class, 'showEditGenresForm'])
+    ->name('admin.movies.genres.edit')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::get('/admin-panel/movies/genres/edit/{id}', [AdminController::class, 'showGenresEditForm'])
+    ->name('admin.movies.genres.edit.form')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::post('/admin-panel/movies/genres/update', [AdminController::class, 'updateGenres'])
+    ->name('admin.movies.genres.update')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::post('/admin-panel/movies/genres/add', [AdminController::class, 'addGenre'])
+    ->name('admin.movies.genres.add')
     ->middleware('AuthMiddleware')
     ->middleware('AdminMiddleware');
 

@@ -96,10 +96,10 @@
     </div>
 
     <a href="/admin-panel/dashboard" class="nav-link <?= $activePage === 'dashboard' ? 'active' : '' ?>">Dashboard</a>
-    <a href="/" class="nav-link">Добавить фильм</a>
+    <a href="/admin-panel/movies/add" class="nav-link <?= $activePage === 'add_movie' ? 'active' : '' ?>">Добавить фильм</a>
     <a href="/admin-panel/movies" class="nav-link <?= $activePage === 'movies' ? 'active' : '' ?>">Редактировать фильмы</a>
-    <a href="/" class="nav-link">Удалить фильм</a>
-    <a href="/admin-panel/users" class="nav-link <?= $activePage === 'users' ? 'active' : '' ?>">Управление пользователями</a>
+    <a href="/admin-panel/movies/genres" class="nav-link <?= $activePage === 'genres' ? 'active' : '' ?>">Редактировать жанры</a>
+    <a href="/admin-panel/movies/delete" class="nav-link <?= $activePage === 'delete_movie' ? 'active' : '' ?>">Удалить фильм</a>
 </nav>
 
 <div class="main-content">

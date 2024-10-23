@@ -73,6 +73,29 @@ class CommentController extends Controller
         Route::redirect("/films/{$movieId}");
     }
 
+    public function toggleLikeComment()
+    {
+        if (!isset($_SESSION['user'])) {
+            Route::redirect('/login');
+            exit();
+        }
+
+        $userId = $_SESSION['user']['id'];
+        $commentId = $_POST['comment_id'];
+
+        $db = new DB();
+
+        $existingLike = $db->fetch("SELECT * FROM comment_likes WHERE comment_id = ? AND user_id = ?", [$commentId, $userId]);
+
+        if ($existingLike) {
+            $db->execute("DELETE FROM comment_likes WHERE comment_id = ? AND user_id = ?", [$commentId, $userId]);
+        } else {
+            $db->execute("INSERT INTO comment_likes (comment_id, user_id) VALUES (?, ?)", [$commentId, $userId]);
+        }
+
+        Route::redirect("/films/{$_POST['movie_id']}");
+    }
+
     private function showFilmPageWithError($movieId, $error)
     {
         $filmController = new FilmController();
