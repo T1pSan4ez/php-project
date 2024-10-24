@@ -52,7 +52,7 @@ class RegisterController extends Controller
         }
 
         if (empty($_POST['birthdate']) || !$validator->validate('birthdate', $_POST['birthdate'])) {
-            $errors['birthdate'] = 'Дата рождения обязательна и должна быть корректной.';
+            $errors['birthdate'] = 'Дата рождения обязательна и должна быть корректной. Минимальный возраст 6 лет, максимальный 100 лет.';
         }
 
         if (empty($_POST['gender']) || !in_array($_POST['gender'], ['male', 'female', 'another'])) {

@@ -55,6 +55,11 @@ Route::get('/admin-panel/edit-movie/{id}', [AdminController::class, 'showEditMov
     ->middleware('AuthMiddleware')
     ->middleware('AdminMiddleware');
 
+Route::post('/admin-panel/movies/update', [AdminController::class, 'updateMovie'])
+    ->name('admin.movies.update')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
 Route::get('/admin-panel/movies/add', [AdminController::class, 'showAddMovieForm'])
     ->name('admin.movies.add.form')
     ->middleware('AuthMiddleware')
@@ -107,11 +112,6 @@ Route::get('/admin-panel/users/generate', [AdminController::class, 'showUserGene
 
 Route::post('/admin-panel/users/generate', [AdminController::class, 'generateRandomUsers'])
     ->name('admin.users.generate')
-    ->middleware('AuthMiddleware')
-    ->middleware('AdminMiddleware');
-
-Route::post('/admin-panel/movies/update', [AdminController::class, 'updateMovie'])
-    ->name('admin.movies.update')
     ->middleware('AuthMiddleware')
     ->middleware('AdminMiddleware');
 

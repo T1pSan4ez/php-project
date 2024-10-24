@@ -116,7 +116,6 @@ class FilmController extends Controller
         $film = $this->getFilmById($id);
 
         if (!$film) {
-
             Route::redirect('/error');
             exit();
         }
@@ -146,13 +145,13 @@ class FilmController extends Controller
     {
         $db = new DB();
         $sql = "
-    SELECT comments.*, users.username, 
-           IFNULL((SELECT COUNT(*) FROM comment_likes WHERE comment_likes.comment_id = comments.id), 0) as like_count
-    FROM comments
-    JOIN users ON comments.user_id = users.id
-    WHERE comments.movie_id = ?
-    ORDER BY comments.created_at DESC
-    LIMIT $limit OFFSET $offset
+        SELECT comments.*, users.username, users.profile_image, 
+               IFNULL((SELECT COUNT(*) FROM comment_likes WHERE comment_likes.comment_id = comments.id), 0) as like_count
+        FROM comments
+        JOIN users ON comments.user_id = users.id
+        WHERE comments.movie_id = ?
+        ORDER BY comments.created_at DESC
+        LIMIT $limit OFFSET $offset
     ";
         return $db->fetchAll($sql, [$id]);
     }

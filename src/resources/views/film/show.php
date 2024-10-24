@@ -132,11 +132,12 @@
                                 <div class="row mb-3 p-3 border rounded shadow-sm">
                                     <div class="col-2 text-center">
                                         <?php
-                                        $profileImage = isset($comment['user_avatar']) && !empty($comment['user_avatar'])
-                                            ? '/uploads/' . htmlspecialchars($comment['user_avatar'])
+                                        $profileImage = isset($comment['profile_image']) && !empty($comment['profile_image'])
+                                            ? '/uploads/' . htmlspecialchars($comment['profile_image'])
                                             : 'https://via.placeholder.com/64';
                                         ?>
                                         <img src="<?= $profileImage ?>" class="rounded-circle" alt="User avatar" width="64" height="64">
+
                                     </div>
                                     <div class="col-8">
                                         <h5 class="mt-0 mb-1"><?= htmlspecialchars($comment['username']) ?></h5>
@@ -161,7 +162,6 @@
                                     </div>
                                 </div>
                             <?php endforeach; ?>
-
                         </div>
 
                         <?php if ($totalPages > 1): ?>

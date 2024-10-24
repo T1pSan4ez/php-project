@@ -2,37 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\RMVC\Database\DB;
-use App\RMVC\Route\Route;
 use App\validation\CommentValidator;
 
 class CommentController extends Controller
 {
     public function addComment()
     {
-        if (!isset($_SESSION['user'])) {
-            Route::redirect('/login');
-            exit();
+        if (!$this->getSessionData('user')) {
+            $this->redirect('/login');
         }
 
-        $userId = $_SESSION['user']['id'];
+        $userId = $this->getSessionData('user')['id'];
         $movieId = $_POST['movie_id'];
-        $userAvatar = $_SESSION['user']['profile_image'];
         $commentText = trim($_POST['comment_text']);
 
         $validator = new CommentValidator();
 
         if (!empty($commentText) && $validator->validate($commentText)) {
-            $db = new DB();
-            $db->execute("INSERT INTO comments (user_id, movie_id, comment_text, user_avatar) VALUES (?, ?, ?, ?)", [
+            $this->db->execute("INSERT INTO comments (user_id, movie_id, comment_text) VALUES (?, ?, ?)", [
                 $userId,
                 $movieId,
                 $commentText,
-                $userAvatar
             ]);
 
-            Route::redirect("/films/{$movieId}");
-        }else {
+            $this->redirect("/films/{$movieId}");
+        } else {
             $error = "Ваш комментарий слишком длинный. Максимальная длина: 512 символов.";
             $this->showFilmPageWithError($movieId, $error);
         }
@@ -40,7 +34,7 @@ class CommentController extends Controller
 
     public function deleteComment()
     {
-        if (!isset($_SESSION['user'])) {
+        if (!$this->getSessionData('user')) {
             echo "Требуется авторизация.";
             return;
         }
@@ -50,13 +44,12 @@ class CommentController extends Controller
             return;
         }
 
-        $userId = $_SESSION['user']['id'];
-        $adminRole = $_SESSION['user']['admin_role'] ?? 0;
+        $userId = $this->getSessionData('user')['id'];
+        $adminRole = $this->getSessionData('user')['admin_role'] ?? 0;
         $commentId = (int)$_POST['comment_id'];
         $movieId = (int)$_POST['movie_id'];
 
-        $db = new DB();
-        $comment = $db->fetch("SELECT user_id FROM comments WHERE id = ?", [$commentId]);
+        $comment = $this->db->fetch("SELECT user_id FROM comments WHERE id = ?", [$commentId]);
 
         if (!$comment) {
             echo "Комментарий не найден.";
@@ -68,32 +61,29 @@ class CommentController extends Controller
             return;
         }
 
-        $db->execute("DELETE FROM comments WHERE id = ?", [$commentId]);
+        $this->db->execute("DELETE FROM comments WHERE id = ?", [$commentId]);
 
-        Route::redirect("/films/{$movieId}");
+        $this->redirect("/films/{$movieId}");
     }
 
     public function toggleLikeComment()
     {
-        if (!isset($_SESSION['user'])) {
-            Route::redirect('/login');
-            exit();
+        if (!$this->getSessionData('user')) {
+            $this->redirect('/login');
         }
 
-        $userId = $_SESSION['user']['id'];
+        $userId = $this->getSessionData('user')['id'];
         $commentId = $_POST['comment_id'];
 
-        $db = new DB();
-
-        $existingLike = $db->fetch("SELECT * FROM comment_likes WHERE comment_id = ? AND user_id = ?", [$commentId, $userId]);
+        $existingLike = $this->db->fetch("SELECT * FROM comment_likes WHERE comment_id = ? AND user_id = ?", [$commentId, $userId]);
 
         if ($existingLike) {
-            $db->execute("DELETE FROM comment_likes WHERE comment_id = ? AND user_id = ?", [$commentId, $userId]);
+            $this->db->execute("DELETE FROM comment_likes WHERE comment_id = ? AND user_id = ?", [$commentId, $userId]);
         } else {
-            $db->execute("INSERT INTO comment_likes (comment_id, user_id) VALUES (?, ?)", [$commentId, $userId]);
+            $this->db->execute("INSERT INTO comment_likes (comment_id, user_id) VALUES (?, ?)", [$commentId, $userId]);
         }
 
-        Route::redirect("/films/{$_POST['movie_id']}");
+        $this->redirect("/films/{$_POST['movie_id']}");
     }
 
     private function showFilmPageWithError($movieId, $error)

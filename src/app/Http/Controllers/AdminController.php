@@ -11,16 +11,24 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $db = new DB();
+        $totalLikes = $this->db->fetch("SELECT COUNT(*) as count FROM comment_likes")['count'];
+        $totalComments = $this->db->fetch("SELECT COUNT(*) as count FROM comments")['count'];
+        $totalMovies = $this->db->fetch("SELECT COUNT(*) as count FROM movies")['count'];
+        $totalGenres = $this->db->fetch("SELECT COUNT(*) as count FROM genres")['count'];
+        $totalUsers = $this->db->fetch("SELECT COUNT(*) as count FROM users")['count'];
 
-        $totalLikes = $db->fetch("SELECT COUNT(*) as count FROM comment_likes")['count'];
-        $totalComments = $db->fetch("SELECT COUNT(*) as count FROM comments")['count'];
-        $totalMovies = $db->fetch("SELECT COUNT(*) as count FROM movies")['count'];
-        $totalGenres = $db->fetch("SELECT COUNT(*) as count FROM genres")['count'];
-        $totalUsers = $db->fetch("SELECT COUNT(*) as count FROM users")['count'];
+        $data = [
+            'title' => 'Панель управления',
+            'activePage' => 'dashboard',
+            'totalLikes' => $totalLikes,
+            'totalComments' => $totalComments,
+            'totalMovies' => $totalMovies,
+            'totalGenres' => $totalGenres,
+            'totalUsers' => $totalUsers
+        ];
 
-        $title = 'Панель управления';
-        $activePage = 'dashboard';
+        extract($data);
+
         $content = __DIR__ . '/../../../resources/views/admin/dashboard.php';
 
         include __DIR__ . '/../../../resources/views/layouts/adminLayout.php';
@@ -30,29 +38,27 @@ class AdminController extends Controller
     {
         $title = 'Редактировать фильмы';
         $activePage = 'movies';
-        $db = new DB();
 
         $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
 
         if (!empty($searchQuery)) {
-            $movies = $db->fetchAll("SELECT * FROM movies WHERE original_title LIKE ? AND release_date IS NOT NULL", ['%' . $searchQuery . '%']);
+            $movies = $this->db->fetchAll("SELECT * FROM movies WHERE original_title LIKE ? AND release_date IS NOT NULL", ['%' . $searchQuery . '%']);
         } else {
-            $movies = $db->fetchAll("SELECT * FROM movies WHERE release_date IS NOT NULL");
+            $movies = $this->db->fetchAll("SELECT * FROM movies WHERE release_date IS NOT NULL");
         }
 
         $content = __DIR__ . '/../../../resources/views/admin/movies.php';
+
         include __DIR__ . '/../../../resources/views/layouts/adminLayout.php';
     }
 
     public function showEditMovieForm($id)
     {
-        $db = new DB();
-
-        $movie = $db->fetch("SELECT * FROM movies WHERE id = ?", [$id]);
+        $movie = $this->db->fetch("SELECT * FROM movies WHERE id = ?", [$id]);
 
         if (!$movie) {
-            $_SESSION['errors'] = 'Фильм не найден.';
-            Route::redirect('/admin-panel/movies');
+            $this->setSessionData('errors', 'Фильм не найден.');
+            $this->redirect('/admin-panel/movies');
             return;
         }
 
@@ -65,7 +71,6 @@ class AdminController extends Controller
 
     public function updateMovie()
     {
-        $db = new DB();
         $validator = new Validator();
         $errors = [];
 
@@ -114,40 +119,42 @@ class AdminController extends Controller
         }
 
         if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
-            $_SESSION['old'] = $_POST;
-            Route::redirect("/admin-panel/movies/edit/$id");
+            $this->setSessionData('errors', $errors);
+            $this->setSessionData('old', $_POST);
+            $this->redirect("/admin-panel/edit-movie/$id");
             return;
         }
 
         if (!empty($_FILES['poster']['name'])) {
-            $targetDir = '/var/www/src/public/uploads/';
-            $posterFileName = basename($_FILES['poster']['name']);
-            $targetFile = $targetDir . $posterFileName;
-
-            if (move_uploaded_file($_FILES['poster']['tmp_name'], $targetFile)) {
-                $db->execute("UPDATE movies SET poster_path = ? WHERE id = ?", [$posterFileName, $id]);
+            $posterFileName = $this->uploadFile($_FILES['poster'], '/var/www/src/public/uploads/');
+            if ($posterFileName) {
+                $this->db->execute("UPDATE movies SET poster_path = ? WHERE id = ?", [$posterFileName, $id]);
             } else {
-                $errors['poster'] = 'Не удалось загрузить изображение. Код ошибки: ' . $_FILES['poster']['error'];
+                $errors['poster'] = 'Не удалось загрузить изображение.';
+                $this->setSessionData('errors', $errors);
+                $this->redirect("/admin-panel/edit-movie/$id");
+                return;
             }
         }
 
-        $db->execute("UPDATE movies SET original_title = ?, title = ?, overview = ?, release_date = ?, vote_average = ?, vote_count = ?, popularity = ?, original_language = ?, video = ? WHERE id = ?", [
-            $original_title,
-            $title,
-            $overview,
-            $release_date,
-            $vote_average,
-            $vote_count,
-            $popularity,
-            $original_language,
-            $video,
-            $id
-        ]);
+        $this->db->execute(
+            "UPDATE movies SET original_title = ?, title = ?, overview = ?, release_date = ?, vote_average = ?, vote_count = ?, popularity = ?, original_language = ?, video = ? WHERE id = ?",
+            [
+                $original_title,
+                $title,
+                $overview,
+                $release_date,
+                $vote_average,
+                $vote_count,
+                $popularity,
+                $original_language,
+                $video,
+                $id
+            ]
+        );
 
-        Route::redirect('/admin-panel/movies');
+        $this->redirect('/admin-panel/movies');
     }
-
 
     public function showAddMovieForm()
     {
@@ -159,7 +166,6 @@ class AdminController extends Controller
 
     public function addMovie()
     {
-        $db = new DB();
         $validator = new Validator();
         $errors = [];
 
@@ -206,48 +212,47 @@ class AdminController extends Controller
         }
 
         if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
-            $_SESSION['old'] = $_POST;
-            Route::redirect('/admin-panel/movies/add');
+            $this->setSessionData('errors', $errors);
+            $this->setSessionData('old', $_POST);
+            $this->redirect('/admin-panel/movies/add');
             return;
         }
 
         if (!empty($_FILES['poster']['name'])) {
-            $targetDir = '/var/www/src/public/uploads/';
-            $posterFileName = basename($_FILES['poster']['name']);
-            $targetFile = $targetDir . $posterFileName;
-
-            if (move_uploaded_file($_FILES['poster']['tmp_name'], $targetFile)) {
+            $posterFileName = $this->uploadFile($_FILES['poster'], '/var/www/src/public/uploads/');
+            if ($posterFileName) {
                 $posterPath = $posterFileName;
             } else {
                 $errors['poster'] = 'Не удалось загрузить изображение.';
             }
         }
 
-        $db->execute("INSERT INTO movies (original_title, title, overview, release_date, vote_average, vote_count, popularity, original_language, poster_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-            $original_title,
-            $title,
-            $overview,
-            $release_date,
-            $vote_average,
-            $vote_count,
-            $popularity,
-            $original_language,
-            $posterPath
-        ]);
+        $this->db->execute(
+            "INSERT INTO movies (original_title, title, overview, release_date, vote_average, vote_count, popularity, original_language, poster_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [
+                $original_title,
+                $title,
+                $overview,
+                $release_date,
+                $vote_average,
+                $vote_count,
+                $popularity,
+                $original_language,
+                $posterPath
+            ]
+        );
 
-        Route::redirect('/admin-panel/movies');
+        $this->redirect('/admin-panel/movies');
     }
 
     public function showDeleteMovieForm()
     {
-        $db = new DB();
         $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
 
         if (!empty($searchQuery)) {
-            $movies = $db->fetchAll("SELECT * FROM movies WHERE original_title LIKE ?", ['%' . $searchQuery . '%']);
+            $movies = $this->db->fetchAll("SELECT * FROM movies WHERE original_title LIKE ?", ['%' . $searchQuery . '%']);
         } else {
-            $movies = $db->fetchAll("SELECT * FROM movies WHERE release_date IS NOT NULL");
+            $movies = $this->db->fetchAll("SELECT * FROM movies WHERE release_date IS NOT NULL");
         }
 
         $title = 'Удалить фильм';
@@ -258,20 +263,17 @@ class AdminController extends Controller
 
     public function deleteMovie($id)
     {
-        $db = new DB();
-        $db->execute("DELETE FROM movies WHERE id = ?", [$id]);
+        $this->db->execute("DELETE FROM movies WHERE id = ?", [$id]);
 
-        Route::redirect('/admin-panel/movies/delete');
+        $this->redirect('/admin-panel/movies/delete');
     }
 
     public function showEditGenresForm()
     {
-        $db = new DB();
-
         $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
 
         if (!empty($searchQuery)) {
-            $movies = $db->fetchAll("SELECT movies.id, movies.original_title, GROUP_CONCAT(genres.name SEPARATOR '; ') as genres
+            $movies = $this->db->fetchAll("SELECT movies.id, movies.original_title, GROUP_CONCAT(genres.name SEPARATOR '; ') as genres
                              FROM movies
                              LEFT JOIN movie_genre ON movies.id = movie_genre.movie_id
                              LEFT JOIN genres ON movie_genre.genre_id = genres.id
@@ -281,7 +283,7 @@ class AdminController extends Controller
             $movies = [];
         }
 
-        $genres = $db->fetchAll("SELECT * FROM genres");
+        $genres = $this->db->fetchAll("SELECT * FROM genres");
 
         $title = 'Редактировать жанры фильмов';
         $activePage = 'genres';
@@ -291,16 +293,15 @@ class AdminController extends Controller
 
     public function showGenresEditForm($id)
     {
-        $db = new DB();
-
-        $movie = $db->fetch("SELECT id, original_title FROM movies WHERE id = ?", [$id]);
+        $movie = $this->db->fetch("SELECT id, original_title FROM movies WHERE id = ?", [$id]);
 
         if (!$movie) {
-            Route::redirect('/admin-panel/movies/genres');
+            $this->redirect('/admin-panel/movies/genres');
             return;
         }
 
-        $selectedGenres = $db->fetchAll("SELECT genre_id FROM movie_genre WHERE movie_id = ?", [$id]);
+        $selectedGenres = $this->db->fetchAll("SELECT genre_id FROM movie_genre WHERE movie_id = ?", [$id]);
+        $genres = $this->db->fetchAll("SELECT * FROM genres");
 
         $title = 'Редактировать жанры для фильма: ' . htmlspecialchars($movie['original_title']);
         $activePage = 'genres';
@@ -308,74 +309,67 @@ class AdminController extends Controller
         include __DIR__ . '/../../../resources/views/layouts/adminLayout.php';
     }
 
-
     public function updateGenres()
     {
-        $db = new DB();
         $movieId = $_POST['movie_id'];
         $selectedGenres = isset($_POST['genres']) ? $_POST['genres'] : [];
 
-        $db->execute("DELETE FROM movie_genre WHERE movie_id = ?", [$movieId]);
+        $this->db->execute("DELETE FROM movie_genre WHERE movie_id = ?", [$movieId]);
 
         foreach ($selectedGenres as $genreId) {
-            $db->execute("INSERT INTO movie_genre (movie_id, genre_id) VALUES (?, ?)", [$movieId, $genreId]);
+            $this->db->execute("INSERT INTO movie_genre (movie_id, genre_id) VALUES (?, ?)", [$movieId, $genreId]);
         }
 
-        Route::redirect('/admin-panel/movies/genres');
+        $this->redirect('/admin-panel/movies/genres');
     }
 
     public function addGenre()
     {
-        $db = new DB();
         $genreId = $_POST['genre_id'];
         $genreName = trim($_POST['genre_name']);
 
-        $existingGenre = $db->fetch("SELECT * FROM genres WHERE id = ? OR name = ?", [$genreId, $genreName]);
+        $existingGenre = $this->db->fetch("SELECT * FROM genres WHERE id = ? OR name = ?", [$genreId, $genreName]);
 
         if ($existingGenre) {
-            $_SESSION['errors'] = 'Жанр с таким ID или названием уже существует.';
-            Route::redirect('/admin-panel/movies/genres');
+            $this->setSessionData('errors', 'Жанр с таким ID или названием уже существует.');
+            $this->redirect('/admin-panel/movies/genres');
             return;
         }
 
-        $db->execute("INSERT INTO genres (id, name) VALUES (?, ?)", [$genreId, $genreName]);
+        $this->db->execute("INSERT INTO genres (id, name) VALUES (?, ?)", [$genreId, $genreName]);
 
-        $_SESSION['success'] = 'Жанр успешно добавлен.';
-        Route::redirect('/admin-panel/movies/genres');
+        $this->setSessionData('success', 'Жанр успешно добавлен.');
+        $this->redirect('/admin-panel/movies/genres');
     }
 
     public function deleteGenres()
     {
-        $db = new DB();
         $selectedGenres = isset($_POST['genre']) ? $_POST['genre'] : [];
 
         if (!empty($selectedGenres)) {
             $genreIds = implode(',', array_fill(0, count($selectedGenres), '?'));
-            $db->execute("DELETE FROM genres WHERE id IN ($genreIds)", $selectedGenres);
+            $this->db->execute("DELETE FROM genres WHERE id IN ($genreIds)", $selectedGenres);
+            $this->db->execute("DELETE FROM movie_genre WHERE genre_id IN ($genreIds)", $selectedGenres);
 
-            $db->execute("DELETE FROM movie_genre WHERE genre_id IN ($genreIds)", $selectedGenres);
-
-            $_SESSION['success'] = 'Выбранные жанры успешно удалены.';
+            $this->setSessionData('success', 'Выбранные жанры успешно удалены.');
         } else {
-            $_SESSION['errors'] = 'Пожалуйста, выберите жанры для удаления.';
+            $this->setSessionData('errors', 'Пожалуйста, выберите жанры для удаления.');
         }
 
-        Route::redirect('/admin-panel/movies/genres');
+        $this->redirect('/admin-panel/movies/genres');
     }
-
 
     public function showUserGenerator()
     {
         $title = 'Генерация пользователей';
         $activePage = 'user_generator';
-        $content = __DIR__ . '/../../../resources/views/admin/generateUsers.php'; // путь к шаблону
+        $content = __DIR__ . '/../../../resources/views/admin/generateUsers.php';
         include __DIR__ . '/../../../resources/views/layouts/adminLayout.php';
     }
 
     public function generateRandomUsers()
     {
         $faker = Factory::create();
-        $db = new DB();
         $count = $_POST['user_count'] ?? 10;
 
         for ($i = 0; $i < $count; $i++) {
@@ -385,14 +379,14 @@ class AdminController extends Controller
             $birthDate = $faker->date('Y-m-d', '-18 years');
             $gender = $faker->randomElement(['male', 'female', 'another']);
 
-            $emailExists = $db->fetch("SELECT COUNT(*) as count FROM users WHERE email = ?", [$email]);
+            $emailExists = $this->db->fetch("SELECT COUNT(*) as count FROM users WHERE email = ?", [$email]);
 
             while ($emailExists['count'] > 0) {
                 $email = $faker->unique()->safeEmail;
-                $emailExists = $db->fetch("SELECT COUNT(*) as count FROM users WHERE email = ?", [$email]);
+                $emailExists = $this->db->fetch("SELECT COUNT(*) as count FROM users WHERE email = ?", [$email]);
             }
 
-            $db->execute("INSERT INTO users (username, email, password, birthdate, gender, admin_role) VALUES (?, ?, ?, ?, ?, ?)", [
+            $this->db->execute("INSERT INTO users (username, email, password, birthdate, gender, admin_role) VALUES (?, ?, ?, ?, ?, ?)", [
                 $username,
                 $email,
                 $password,
@@ -402,7 +396,7 @@ class AdminController extends Controller
             ]);
         }
 
-        $_SESSION['success'] = "$count пользователей успешно сгенерированы!";
-        Route::redirect('/admin-panel/users/generate');
+        $this->setSessionData('success', "$count пользователей успешно сгенерированы!");
+        $this->redirect('/admin-panel/users/generate');
     }
 }
