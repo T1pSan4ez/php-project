@@ -16,11 +16,6 @@ class RegisterController extends Controller
         include __DIR__ . '/../../../resources/views/layouts/layout.php';
     }
 
-    public function show($post)
-    {
-        return View::view('register.show', compact('post'));
-    }
-
     public function store()
     {
         $errors = [];
@@ -60,8 +55,8 @@ class RegisterController extends Controller
             $errors['birthdate'] = 'Дата рождения обязательна и должна быть корректной.';
         }
 
-        if (empty($_POST['gender']) || !in_array($_POST['gender'], ['male', 'female'])) {
-            $errors['gender'] = 'Пол обязателен. Выберите мужской или женский пол.';
+        if (empty($_POST['gender']) || !in_array($_POST['gender'], ['male', 'female', 'another'])) {
+            $errors['gender'] = 'Пол обязателен.';
         }
 
         if (!empty($_POST['rating']) && !$validator->validate('preferred_rating', $_POST['rating'])) {

@@ -95,13 +95,14 @@ Route::post('/admin-panel/movies/genres/add', [AdminController::class, 'addGenre
     ->middleware('AuthMiddleware')
     ->middleware('AdminMiddleware');
 
+Route::post('/admin-panel/movies/genres/delete', [AdminController::class, 'deleteGenres'])
+    ->name('admin.movies.genres.delete')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
 Route::post('/admin-panel/movies/update', [AdminController::class, 'updateMovie'])
     ->name('admin.movies.update')
     ->middleware('AuthMiddleware')
     ->middleware('AdminMiddleware');
 
-Route::get('/admin-panel/users', [AdminController::class, 'manageUsers'])
-    ->name('admin.users')
-    ->middleware('AuthMiddleware')
-    ->middleware('AdminMiddleware');
 

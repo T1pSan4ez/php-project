@@ -11,9 +11,18 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $title = 'Dashboard';
+        $db = new DB();
+
+        $totalLikes = $db->fetch("SELECT COUNT(*) as count FROM comment_likes")['count'];
+        $totalComments = $db->fetch("SELECT COUNT(*) as count FROM comments")['count'];
+        $totalMovies = $db->fetch("SELECT COUNT(*) as count FROM movies")['count'];
+        $totalGenres = $db->fetch("SELECT COUNT(*) as count FROM genres")['count'];
+        $totalUsers = $db->fetch("SELECT COUNT(*) as count FROM users")['count'];
+
+        $title = 'Панель управления';
         $activePage = 'dashboard';
         $content = __DIR__ . '/../../../resources/views/admin/dashboard.php';
+
         include __DIR__ . '/../../../resources/views/layouts/adminLayout.php';
     }
 
@@ -272,6 +281,8 @@ class AdminController extends Controller
             $movies = [];
         }
 
+        $genres = $db->fetchAll("SELECT * FROM genres");
+
         $title = 'Редактировать жанры фильмов';
         $activePage = 'genres';
         $content = __DIR__ . '/../../../resources/views/admin/movies/editGenres.php';
@@ -291,13 +302,12 @@ class AdminController extends Controller
 
         $selectedGenres = $db->fetchAll("SELECT genre_id FROM movie_genre WHERE movie_id = ?", [$id]);
 
-        $genres = $db->fetchAll("SELECT * FROM genres");
-
         $title = 'Редактировать жанры для фильма: ' . htmlspecialchars($movie['original_title']);
         $activePage = 'genres';
         $content = __DIR__ . '/../../../resources/views/admin/movies/editMovieGenres.php';
         include __DIR__ . '/../../../resources/views/layouts/adminLayout.php';
     }
+
 
     public function updateGenres()
     {
@@ -331,6 +341,25 @@ class AdminController extends Controller
         $db->execute("INSERT INTO genres (id, name) VALUES (?, ?)", [$genreId, $genreName]);
 
         $_SESSION['success'] = 'Жанр успешно добавлен.';
+        Route::redirect('/admin-panel/movies/genres');
+    }
+
+    public function deleteGenres()
+    {
+        $db = new DB();
+        $selectedGenres = isset($_POST['genre']) ? $_POST['genre'] : [];
+
+        if (!empty($selectedGenres)) {
+            $genreIds = implode(',', array_fill(0, count($selectedGenres), '?'));
+            $db->execute("DELETE FROM genres WHERE id IN ($genreIds)", $selectedGenres);
+
+            $db->execute("DELETE FROM movie_genre WHERE genre_id IN ($genreIds)", $selectedGenres);
+
+            $_SESSION['success'] = 'Выбранные жанры успешно удалены.';
+        } else {
+            $_SESSION['errors'] = 'Пожалуйста, выберите жанры для удаления.';
+        }
+
         Route::redirect('/admin-panel/movies/genres');
     }
 }

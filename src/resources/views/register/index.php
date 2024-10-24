@@ -98,6 +98,10 @@
                                 <input class="form-check-input" type="radio" name="gender" id="female" value="female" <?= (isset($_SESSION['form_data']['gender']) && $_SESSION['form_data']['gender'] == 'female') ? 'checked' : '' ?>>
                                 <label class="form-check-label" for="female">Женский</label>
                             </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender" id="another" value="another" <?= (isset($_SESSION['form_data']['gender']) && $_SESSION['form_data']['gender'] == 'another') ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="another">Что-то другое...</label>
+                            </div>
 
                             <?php if (!empty($_SESSION['errors']['gender'])): ?>
                                 <div class="invalid-feedback" style="display: block;">

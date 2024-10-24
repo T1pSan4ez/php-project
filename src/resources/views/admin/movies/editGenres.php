@@ -13,6 +13,7 @@
 <?php endif; ?>
 
 <div class="mb-3">
+    <h5>Добавить жанр</h5>
     <form action="/admin-panel/movies/genres/add" method="POST" class="d-flex">
         <input style="width: 300px;" type="text" name="genre_name" class="form-control me-2" placeholder="Введите название нового жанра" required>
         <input style="width: 100px;" type="number" name="genre_id" class="form-control me-2" placeholder="ID жанра" required>
@@ -20,6 +21,49 @@
     </form>
 </div>
 
+<?php if (!empty($genres)): ?>
+    <div>
+        <h5>Удалить жанры</h5>
+        <form id="deleteGenresForm" method="POST" action="/admin-panel/movies/genres/delete" class="d-flex justify-content-between align-items-center">
+            <div class="d-flex flex-wrap">
+                <?php foreach ($genres as $genre): ?>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="genre_<?= $genre['id'] ?>" name="genre[]" value="<?= htmlspecialchars($genre['id']) ?>">
+                        <label class="form-check-label" for="genre_<?= $genre['id'] ?>">
+                            <?= htmlspecialchars($genre['name']) ?>
+                        </label>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <div style="width: 500px;">
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">Удалить выбранные жанры</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Подтверждение удаления</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Вы уверены, что хотите удалить выбранные жанры? Это действие необратимо.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-danger" onclick="document.getElementById('deleteGenresForm').submit();">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<?php else: ?>
+    <p>Нет доступных жанров для отображения.</p>
+<?php endif; ?>
+
+<h5>Поиск фильмов</h5>
 <div class="d-flex justify-content-between align-items-center mb-4">
     <form action="/admin-panel/movies/genres" method="GET" class="d-flex">
         <input style="width: 250px;" type="text" name="search" class="form-control me-2" placeholder="Введите название фильма" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
@@ -57,3 +101,4 @@
         </div>
     <?php endif; ?>
 <?php endif; ?>
+
