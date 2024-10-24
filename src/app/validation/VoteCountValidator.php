@@ -2,10 +2,14 @@
 
 namespace App\validation;
 
+use App\validation\traits\NumericValidationTrait;
+
 class VoteCountValidator implements ValidatorInterface
 {
+    use NumericValidationTrait;
+
     public function validate($value): bool
     {
-        return is_numeric($value) && $value >= 0;
+        return $this->validateNumericRange($value, 0, PHP_INT_MAX);
     }
 }
