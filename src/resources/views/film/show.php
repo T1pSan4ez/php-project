@@ -24,20 +24,21 @@
 
                         <div class="col-md-6">
                             <div class="mb-2">
-                                <strong>ID фильма:</strong> <?= htmlspecialchars($film['id']) ?>
+                                <strong>ID фильма:</strong>  <span><?= htmlspecialchars($film['id']) ?></span>
                             </div>
                             <div class="mb-2">
-                                <strong>Популярность IMDB:</strong> <?= htmlspecialchars($film['popularity']) ?>
+                                <strong>Популярность IMDB:</strong> <span><?= htmlspecialchars($film['popularity']) ?></span>
                             </div>
                             <div class="mb-2">
-                                <strong>Рейтинг IMDB:</strong> <?= number_format((float)$film['vote_average'], 2); ?>
+                                <strong>Рейтинг IMDB:</strong> <span><?= number_format((float)$film['vote_average'], 2); ?></span>
                             </div>
                             <div class="mb-2">
-                                <strong>Жанр:</strong>
+                                <strong>Жанр:</strong><span>
                                 <?php if (!empty($genres)): ?>
                                     <?php foreach ($genres as $genre): ?>
                                         <?= htmlspecialchars($genre['name']) ?>;
                                     <?php endforeach; ?>
+                                </span>
                                 <?php else: ?>
                                     <span>Нет данных</span>
                                 <?php endif; ?>
@@ -60,7 +61,7 @@
                                 <iframe class="w-100" src="https://www.youtube.com/embed/<?= htmlspecialchars($film['video']) ?>" allowfullscreen></iframe>
                             </div>
                         <?php else: ?>
-                            <p class="text-muted">Видео недоступно.</p>
+                            <p>Видео недоступно.</p>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -140,7 +141,7 @@
                                     <div class="col-8">
                                         <h5 class="mt-0 mb-1"><?= htmlspecialchars($comment['username']) ?></h5>
                                         <p class="mb-1"><?= nl2br(htmlspecialchars($comment['comment_text'])) ?></p>
-                                        <small class="text-muted"><?= htmlspecialchars($comment['created_at']) ?></small>
+                                        <small ><?= htmlspecialchars($comment['created_at']) ?></small>
                                     </div>
 
                                     <div class="col-2 text-end">

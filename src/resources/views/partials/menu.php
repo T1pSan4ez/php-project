@@ -1,6 +1,7 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
+<nav class="navbar navbar-expand-lg sticky-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="/films">Фильмы</a>
+        <button class="btn btn-outline-secondary me-3" id="theme-toggle">Темная тема</button>
 
         <div class="ms-auto d-flex align-items-center">
             <?php if (isset($_SESSION['user'])): ?>
@@ -25,3 +26,25 @@
 
     </div>
 </nav>
+
+<script>
+    let currentTheme = localStorage.getItem('theme') || 'light';
+
+    document.body.classList.add(currentTheme);
+    const themeToggleButton = document.getElementById('theme-toggle');
+    themeToggleButton.textContent = currentTheme === 'dark' ? 'На светлую тему' : 'На темную тему';
+
+    themeToggleButton.addEventListener('click', function () {
+        if (document.body.classList.contains('light')) {
+            document.body.classList.remove('light');
+            document.body.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            themeToggleButton.textContent = 'На светлую тему';
+        } else {
+            document.body.classList.remove('dark');
+            document.body.classList.add('light');
+            localStorage.setItem('theme', 'light');
+            themeToggleButton.textContent = 'На темную тему';
+        }
+    });
+</script>

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\RMVC\Database\DB;
 use App\RMVC\Route\Route;
-use App\RMVC\View\View;
+use Faker\Factory;
 use App\validation\Validator;
 
 class AdminController extends Controller
@@ -361,5 +361,48 @@ class AdminController extends Controller
         }
 
         Route::redirect('/admin-panel/movies/genres');
+    }
+
+
+    public function showUserGenerator()
+    {
+        $title = 'Генерация пользователей';
+        $activePage = 'user_generator';
+        $content = __DIR__ . '/../../../resources/views/admin/generateUsers.php'; // путь к шаблону
+        include __DIR__ . '/../../../resources/views/layouts/adminLayout.php';
+    }
+
+    public function generateRandomUsers()
+    {
+        $faker = Factory::create();
+        $db = new DB();
+        $count = $_POST['user_count'] ?? 10;
+
+        for ($i = 0; $i < $count; $i++) {
+            $username = $faker->name;
+            $email = $faker->unique()->safeEmail;
+            $password = password_hash('password', PASSWORD_DEFAULT);
+            $birthDate = $faker->date('Y-m-d', '-18 years');
+            $gender = $faker->randomElement(['male', 'female', 'another']);
+
+            $emailExists = $db->fetch("SELECT COUNT(*) as count FROM users WHERE email = ?", [$email]);
+
+            while ($emailExists['count'] > 0) {
+                $email = $faker->unique()->safeEmail;
+                $emailExists = $db->fetch("SELECT COUNT(*) as count FROM users WHERE email = ?", [$email]);
+            }
+
+            $db->execute("INSERT INTO users (username, email, password, birthdate, gender, admin_role) VALUES (?, ?, ?, ?, ?, ?)", [
+                $username,
+                $email,
+                $password,
+                $birthDate,
+                $gender,
+                0
+            ]);
+        }
+
+        $_SESSION['success'] = "$count пользователей успешно сгенерированы!";
+        Route::redirect('/admin-panel/users/generate');
     }
 }

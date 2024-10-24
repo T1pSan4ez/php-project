@@ -100,6 +100,7 @@
     <a href="/admin-panel/movies" class="nav-link <?= $activePage === 'movies' ? 'active' : '' ?>">Редактировать фильмы</a>
     <a href="/admin-panel/movies/genres" class="nav-link <?= $activePage === 'genres' ? 'active' : '' ?>">Редактировать жанры</a>
     <a href="/admin-panel/movies/delete" class="nav-link <?= $activePage === 'delete_movie' ? 'active' : '' ?>">Удалить фильм</a>
+    <a href="/admin-panel/users/generate" class="nav-link <?= $activePage === 'generate-users' ? 'active' : '' ?>">Генерация пользователей</a>
 </nav>
 
 <div class="main-content">

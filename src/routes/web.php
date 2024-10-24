@@ -100,6 +100,16 @@ Route::post('/admin-panel/movies/genres/delete', [AdminController::class, 'delet
     ->middleware('AuthMiddleware')
     ->middleware('AdminMiddleware');
 
+Route::get('/admin-panel/users/generate', [AdminController::class, 'showUserGenerator'])
+    ->name('admin.users.generateShow')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
+Route::post('/admin-panel/users/generate', [AdminController::class, 'generateRandomUsers'])
+    ->name('admin.users.generate')
+    ->middleware('AuthMiddleware')
+    ->middleware('AdminMiddleware');
+
 Route::post('/admin-panel/movies/update', [AdminController::class, 'updateMovie'])
     ->name('admin.movies.update')
     ->middleware('AuthMiddleware')
